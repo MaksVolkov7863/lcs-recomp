@@ -1,0 +1,7 @@
+/out/
+/lcs/game/
+/lcs/analysis/
+/lcs/progress/
+.vs/
+.vscode/
+/docker/ccache-*/
