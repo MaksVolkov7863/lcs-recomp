@@ -7,6 +7,7 @@
 #include "ge_gpu_backend.hpp"
 #include "ge_renderer.hpp"
 #include "lcs_render_config.hpp"
+#include "lcs_region.hpp"
 
 #include <algorithm>
 #include <cstdint>
@@ -53,6 +54,20 @@ int main(int argc, char **argv) {
 
         psprecomp::Runtime runtime;
         runtime.set_game_root(game_root);
+
+        const lcs::RegionInfo region = lcs::detect_region(game_root);
+        if (region.disc_id.empty()) {
+            std::cout << "[region] No PARAM.SFO under "
+                      << (game_root / "PSP_GAME").string() << ", assuming "
+                      << lcs::kPrimaryDiscId << "\n" << std::flush;
+        } else {
+            std::cout << "[region] Disc " << region.disc_id << " (" << region.title
+                      << ")\n" << std::flush;
+            if (!region.is_primary)
+                std::cout << "[region] Not " << lcs::kPrimaryDiscId
+                          << ": addresses are compiled for US v1.05, so expect glitches.\n"
+                          << std::flush;
+        }
 
         const auto stats = elf.load_and_relocate(runtime.memory(), psprecomp::kDefaultPspUserLoadBase);
         std::cout << "Loaded " << elf_path.string() << " (" << stats.total << " relocations applied)\n" << std::flush;
